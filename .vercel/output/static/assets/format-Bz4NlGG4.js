@@ -1,1 +1,0 @@
-const n=t=>{const r=Number(t??0);return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(r)},e=t=>new Intl.NumberFormat("id-ID").format(Number(t??0)),m=()=>new Date().toISOString().slice(0,10);export{n as i,e as n,m as t};
