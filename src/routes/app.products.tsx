@@ -183,6 +183,12 @@ function ProductsPage() {
                 ) : (
                   filtered.map((p) => {
                     const low = Number(p.stock) <= Number(p.min_stock) && Number(p.min_stock) > 0;
+                    // Opening stock is a one-time setup: lock once it's locked in
+                    // the DB, or once the product already carries any stock.
+                    const openingLocked =
+                      !!p.opening_locked ||
+                      Number(p.stock) > 0 ||
+                      Number(p.opening_stock ?? 0) > 0;
                     return (
                       <TableRow key={p.id}>
                         <TableCell className="font-medium">{p.name}</TableCell>
@@ -216,10 +222,10 @@ function ProductsPage() {
                                     <Button
                                       size="icon"
                                       variant="ghost"
-                                      disabled={!!p.opening_locked}
+                                      disabled={openingLocked}
                                       onClick={() => setOpeningFor(p)}
                                     >
-                                      {p.opening_locked ? (
+                                      {openingLocked ? (
                                         <Lock className="h-4 w-4 text-muted-foreground" />
                                       ) : (
                                         <PackagePlus className="h-4 w-4 text-primary" />
@@ -228,7 +234,7 @@ function ProductsPage() {
                                   </span>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  {p.opening_locked
+                                  {openingLocked
                                     ? t("products.openingLocked")
                                     : t("products.openingTooltip")}
                                 </TooltipContent>
@@ -471,12 +477,15 @@ function OpeningStockDialog({
   async function save(e: React.FormEvent) {
     e.preventDefault();
     if (qty < 0 || cost < 0) return toast.error(t("products.openingNonNegative"));
+    if (product.opening_locked) return toast.error(t("products.openingLocked"));
     setSaving(true);
-    const { error } = await supabase.rpc("set_opening_stock", {
-      _product_id: product.id,
-      _qty: qty,
-      _cost: cost,
-    });
+    // Set the opening stock and lock it immediately ("sekali pakai"). Locking
+    // here (instead of via a DB function) keeps the fix on the frontend so it
+    // deploys automatically. The "own products" RLS policy permits this update.
+    const { error } = await supabase
+      .from("products")
+      .update({ stock: qty, cost_price: cost, opening_stock: qty, opening_locked: true })
+      .eq("id", product.id);
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success(t("products.openingSaved"));
