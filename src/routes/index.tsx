@@ -78,7 +78,7 @@ function Index() {
         <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[
             { icon: Boxes, title: "Manajemen Stok", desc: "Pantau stok semen, besi, cat, pipa, dll. lengkap dengan satuan & stok minimum." },
-            { icon: FileText, title: "Penjualan & Pembelian", desc: "Buat nota dengan banyak item, otomatis update stok dan harga modal." },
+            { icon: FileText, title: "Penjualan & Pembelian", desc: "Buat nota dengan banyak item, otomatis update stok dan harga pokok." },
             { icon: TrendingUp, title: "Visualisasi Penjualan", desc: "Grafik tren penjualan harian, produk terlaris, dan margin keuntungan." },
             { icon: BarChart3, title: "Laporan Keuangan", desc: "Laporan laba/rugi, arus kas, dan pengeluaran operasional siap unduh." },
             { icon: ShieldCheck, title: "Data Aman", desc: "Setiap toko punya data terisolasi. Hanya Anda yang bisa mengaksesnya." },
