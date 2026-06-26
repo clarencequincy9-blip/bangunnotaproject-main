@@ -21,6 +21,7 @@ import { Route as AppPurchasesRouteImport } from './routes/app.purchases'
 import { Route as AppProductsRouteImport } from './routes/app.products'
 import { Route as AppInventoryMutationRouteImport } from './routes/app.inventory-mutation'
 import { Route as AppExpensesRouteImport } from './routes/app.expenses'
+import { Route as AppDocsRouteImport } from './routes/app.docs'
 import { Route as AppContactsRouteImport } from './routes/app.contacts'
 import { Route as AppAdjustmentsRouteImport } from './routes/app.adjustments'
 
@@ -84,6 +85,11 @@ const AppExpensesRoute = AppExpensesRouteImport.update({
   path: '/expenses',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDocsRoute = AppDocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppContactsRoute = AppContactsRouteImport.update({
   id: '/contacts',
   path: '/contacts',
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/app/adjustments': typeof AppAdjustmentsRoute
   '/app/contacts': typeof AppContactsRoute
+  '/app/docs': typeof AppDocsRoute
   '/app/expenses': typeof AppExpensesRoute
   '/app/inventory-mutation': typeof AppInventoryMutationRoute
   '/app/products': typeof AppProductsRoute
@@ -116,6 +123,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/app/adjustments': typeof AppAdjustmentsRoute
   '/app/contacts': typeof AppContactsRoute
+  '/app/docs': typeof AppDocsRoute
   '/app/expenses': typeof AppExpensesRoute
   '/app/inventory-mutation': typeof AppInventoryMutationRoute
   '/app/products': typeof AppProductsRoute
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/app/adjustments': typeof AppAdjustmentsRoute
   '/app/contacts': typeof AppContactsRoute
+  '/app/docs': typeof AppDocsRoute
   '/app/expenses': typeof AppExpensesRoute
   '/app/inventory-mutation': typeof AppInventoryMutationRoute
   '/app/products': typeof AppProductsRoute
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/app/adjustments'
     | '/app/contacts'
+    | '/app/docs'
     | '/app/expenses'
     | '/app/inventory-mutation'
     | '/app/products'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/app/adjustments'
     | '/app/contacts'
+    | '/app/docs'
     | '/app/expenses'
     | '/app/inventory-mutation'
     | '/app/products'
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/app/adjustments'
     | '/app/contacts'
+    | '/app/docs'
     | '/app/expenses'
     | '/app/inventory-mutation'
     | '/app/products'
@@ -285,6 +297,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppExpensesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/docs': {
+      id: '/app/docs'
+      path: '/docs'
+      fullPath: '/app/docs'
+      preLoaderRoute: typeof AppDocsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/contacts': {
       id: '/app/contacts'
       path: '/contacts'
@@ -305,6 +324,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppAdjustmentsRoute: typeof AppAdjustmentsRoute
   AppContactsRoute: typeof AppContactsRoute
+  AppDocsRoute: typeof AppDocsRoute
   AppExpensesRoute: typeof AppExpensesRoute
   AppInventoryMutationRoute: typeof AppInventoryMutationRoute
   AppProductsRoute: typeof AppProductsRoute
@@ -319,6 +339,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAdjustmentsRoute: AppAdjustmentsRoute,
   AppContactsRoute: AppContactsRoute,
+  AppDocsRoute: AppDocsRoute,
   AppExpensesRoute: AppExpensesRoute,
   AppInventoryMutationRoute: AppInventoryMutationRoute,
   AppProductsRoute: AppProductsRoute,

@@ -17,6 +17,7 @@ import {
   Menu,
   Settings,
   ContactRound,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -65,6 +66,7 @@ function buildNavGroups(t: (k: string) => string): NavGroup[] {
       items: [{ to: "/app/reports", label: t("nav.reports"), icon: PieChart }],
     },
     { title: t("groups.account"), items: [{ to: "/app/settings", label: t("nav.settings"), icon: Settings }] },
+    { title: t("groups.help"), items: [{ to: "/app/docs", label: t("nav.docs"), icon: BookOpen }] },
   ];
 }
 

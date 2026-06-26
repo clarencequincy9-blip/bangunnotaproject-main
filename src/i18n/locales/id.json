@@ -29,14 +29,16 @@
     "inventoryMutation": "Mutasi Persediaan",
     "reports": "5. Laporan Keuangan",
     "settings": "Pengaturan",
-    "signOut": "Keluar"
+    "signOut": "Keluar",
+    "docs": "Panduan Penggunaan"
   },
   "groups": {
     "main": "Dashboard Utama",
     "inbound": "Alur Hulu (Inbound & Persediaan)",
     "outbound": "Alur Hilir (Outbound & Kas)",
     "financial": "Finansial & Evaluasi",
-    "account": "Akun"
+    "account": "Akun",
+    "help": "Bantuan"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -244,6 +246,15 @@
       "contacts": "Pelanggan & Pemasok",
       "contactsDesc": "Semua pelanggan, batas kredit, dan pemasok"
     }
+  },
+  "docs": {
+    "title": "Panduan Penggunaan",
+    "subtitle": "Pelajari cara memakai aplikasi dari awal sampai akhir.",
+    "searchPlaceholder": "Cari di panduan… (mis. stok awal, laporan)",
+    "noResults": "Tidak ada topik yang cocok dengan pencarian.",
+    "toc": "Daftar Isi",
+    "results": "{{n}} topik ditemukan",
+    "clear": "Hapus"
   },
   "tx": {
     "saleTitle": "Transaksi Penjualan Baru",

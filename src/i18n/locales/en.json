@@ -29,14 +29,16 @@
     "inventoryMutation": "Inventory Mutation",
     "reports": "5. Financial Reports",
     "settings": "Settings",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "docs": "User Guide"
   },
   "groups": {
     "main": "Main Dashboard",
     "inbound": "Upstream (Inbound & Inventory)",
     "outbound": "Downstream (Outbound & Cash)",
     "financial": "Financial & Review",
-    "account": "Account"
+    "account": "Account",
+    "help": "Help"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -244,6 +246,15 @@
       "contacts": "Customers & Suppliers",
       "contactsDesc": "All customers, credit limits, and suppliers"
     }
+  },
+  "docs": {
+    "title": "User Guide",
+    "subtitle": "Learn how to use the app from start to finish.",
+    "searchPlaceholder": "Search the guide… (e.g. opening stock, report)",
+    "noResults": "No topics match your search.",
+    "toc": "Contents",
+    "results": "{{n}} topics found",
+    "clear": "Clear"
   },
   "tx": {
     "saleTitle": "New Sales Transaction",
