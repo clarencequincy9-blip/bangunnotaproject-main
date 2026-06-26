@@ -86,7 +86,18 @@ function ExpensesPage() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    const { error } = await supabase.from("expenses").insert({ ...form, user_id: user!.id });
+    let { error } = await supabase.from("expenses").insert({ ...form, user_id: user!.id });
+    // Pengaman: bila kolom payment_status belum ada di database, simpan beban tanpa kolom itu
+    // supaya pencatatan tidak pernah error. Status tersimpan otomatis setelah kolom ditambahkan.
+    if (error && error.message?.toLowerCase().includes("payment_status")) {
+      ({ error } = await supabase.from("expenses").insert({
+        user_id: user!.id,
+        category: form.category,
+        amount: form.amount,
+        expense_date: form.expense_date,
+        notes: form.notes,
+      }));
+    }
     if (error) return toast.error(error.message);
     toast.success(t("expenses.saved"));
     setOpen(false);
