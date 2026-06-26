@@ -403,7 +403,7 @@ function ProductDialog({
               step="any"
               value={form.stock}
               onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })}
-              disabled={!!edit}
+              disabled
             />
             {edit ? (
               <p className="text-xs text-muted-foreground">
