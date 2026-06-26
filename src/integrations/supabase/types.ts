@@ -76,6 +76,7 @@ export type Database = {
           expense_date: string
           id: string
           notes: string | null
+          payment_status: string
           user_id: string
         }
         Insert: {
@@ -85,6 +86,7 @@ export type Database = {
           expense_date?: string
           id?: string
           notes?: string | null
+          payment_status?: string
           user_id: string
         }
         Update: {
@@ -94,6 +96,7 @@ export type Database = {
           expense_date?: string
           id?: string
           notes?: string | null
+          payment_status?: string
           user_id?: string
         }
         Relationships: []

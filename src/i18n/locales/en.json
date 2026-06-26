@@ -114,7 +114,8 @@
     "new": "Add Expense", "category": "Category",
     "noExpenses": "No operating expenses yet.",
     "addShort": "New", "newDialog": "New Operating Expense",
-    "saved": "Expense recorded"
+    "saved": "Expense recorded",
+    "paymentStatus": "Payment Status"
   },
   "contacts": {
     "title": "Customers & Suppliers",

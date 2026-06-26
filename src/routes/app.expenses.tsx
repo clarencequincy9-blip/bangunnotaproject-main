@@ -31,6 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2 } from "lucide-react";
 import { idr, today } from "@/lib/format";
 import { toast } from "sonner";
@@ -50,6 +51,12 @@ const CATEGORIES = [
   "Lainnya",
 ];
 
+const PAYMENT_STATUSES = [
+  { value: "cash", labelKey: "tx.cash" },
+  { value: "transfer", labelKey: "tx.transfer" },
+  { value: "credit", labelKey: "tx.creditDebt" },
+];
+
 export const Route = createFileRoute("/app/expenses")({ component: ExpensesPage });
 
 function ExpensesPage() {
@@ -61,6 +68,7 @@ function ExpensesPage() {
     category: "Lainnya",
     amount: 0,
     expense_date: today(),
+    payment_status: "cash",
     notes: "",
   });
 
@@ -82,7 +90,7 @@ function ExpensesPage() {
     if (error) return toast.error(error.message);
     toast.success(t("expenses.saved"));
     setOpen(false);
-    setForm({ category: "Lainnya", amount: 0, expense_date: today(), notes: "" });
+    setForm({ category: "Lainnya", amount: 0, expense_date: today(), payment_status: "cash", notes: "" });
     qc.invalidateQueries({ queryKey: ["expenses"] });
     qc.invalidateQueries({ queryKey: ["dash-stats"] });
   }
@@ -146,6 +154,24 @@ function ExpensesPage() {
                 />
               </div>
               <div className="space-y-2">
+                <Label>{t("expenses.paymentStatus")}</Label>
+                <Select
+                  value={form.payment_status}
+                  onValueChange={(v) => setForm({ ...form, payment_status: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PAYMENT_STATUSES.map((s) => (
+                      <SelectItem key={s.value} value={s.value}>
+                        {t(s.labelKey)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
                 <Label>{t("common.notes")}</Label>
                 <Textarea
                   value={form.notes}
@@ -168,6 +194,7 @@ function ExpensesPage() {
                 <TableRow>
                   <TableHead>{t("common.date")}</TableHead>
                   <TableHead>{t("common.category")}</TableHead>
+                  <TableHead>{t("expenses.paymentStatus")}</TableHead>
                   <TableHead>{t("common.notes")}</TableHead>
                   <TableHead className="text-right">{t("common.amount")}</TableHead>
                   <TableHead className="w-16"></TableHead>
@@ -176,7 +203,7 @@ function ExpensesPage() {
               <TableBody>
                 {expenses.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
+                    <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
                       {t("expenses.noExpenses")}
                     </TableCell>
                   </TableRow>
@@ -185,6 +212,15 @@ function ExpensesPage() {
                     <TableRow key={e.id}>
                       <TableCell>{e.expense_date}</TableCell>
                       <TableCell>{e.category}</TableCell>
+                      <TableCell>
+                        {e.payment_status === "credit" ? (
+                          <Badge variant="destructive">{t("tx.creditDebt")}</Badge>
+                        ) : (
+                          <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">
+                            {t(e.payment_status === "transfer" ? "tx.transfer" : "tx.cash")}
+                          </Badge>
+                        )}
+                      </TableCell>
                       <TableCell className="text-muted-foreground">{e.notes ?? "—"}</TableCell>
                       <TableCell className="text-right font-semibold">{idr(e.amount)}</TableCell>
                       <TableCell>

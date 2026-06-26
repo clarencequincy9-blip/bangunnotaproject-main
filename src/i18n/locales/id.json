@@ -114,7 +114,8 @@
     "new": "Tambah Beban", "category": "Kategori",
     "noExpenses": "Belum ada beban operasional.",
     "addShort": "Baru", "newDialog": "Beban Operasional Baru",
-    "saved": "Beban dicatat"
+    "saved": "Beban dicatat",
+    "paymentStatus": "Status Pembayaran"
   },
   "contacts": {
     "title": "Pelanggan & Pemasok",
