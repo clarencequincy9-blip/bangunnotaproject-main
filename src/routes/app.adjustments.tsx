@@ -76,10 +76,10 @@ function AdjustmentsPage() {
         <div className="flex gap-2">
           <ExportMenu
             spec={() => ({
-              title: "Penyesuaian Stok",
-              subtitle: `Total ${rows.length} catatan`,
+              title: t("adjustments.title"),
+              subtitle: t("adjustments.exportRecords", { n: rows.length }),
               filename: `Penyesuaian-Stok_${today()}`,
-              head: ["Tanggal", "Produk", "Satuan", "Perubahan", "Alasan"],
+              head: [t("common.date"), t("adjustments.product"), t("products.unit"), t("adjustments.change"), t("adjustments.reason")],
               body: rows.map((r) => [
                 r.adjusted_at,
                 r.product?.name ?? "—",
@@ -93,7 +93,7 @@ function AdjustmentsPage() {
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2">
-                <Plus className="h-4 w-4" /> Penyesuaian Baru
+                <Plus className="h-4 w-4" /> {t("adjustments.new")}
               </Button>
             </DialogTrigger>
             <NewAdjustmentDialog
@@ -114,10 +114,10 @@ function AdjustmentsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Tanggal</TableHead>
-                  <TableHead>Produk</TableHead>
-                  <TableHead className="text-right">Perubahan</TableHead>
-                  <TableHead>Alasan</TableHead>
+                  <TableHead>{t("common.date")}</TableHead>
+                  <TableHead>{t("adjustments.product")}</TableHead>
+                  <TableHead className="text-right">{t("adjustments.change")}</TableHead>
+                  <TableHead>{t("adjustments.reason")}</TableHead>
                   <TableHead className="w-16" />
                 </TableRow>
               </TableHeader>
@@ -125,7 +125,7 @@ function AdjustmentsPage() {
                 {rows.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
-                      Belum ada penyesuaian.
+                      {t("adjustments.noAdjustments")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -148,7 +148,7 @@ function AdjustmentsPage() {
                           size="icon"
                           variant="ghost"
                           onClick={async () => {
-                            if (!confirm("Hapus penyesuaian ini? Stok akan dikembalikan."))
+                            if (!confirm(t("adjustments.deleteConfirm")))
                               return;
                             const { error } = await supabase
                               .from("stock_adjustments")
@@ -156,7 +156,7 @@ function AdjustmentsPage() {
                               .eq("id", r.id);
                             if (error) toast.error(error.message);
                             else {
-                              toast.success("Dihapus");
+                              toast.success(t("common.deleted"));
                               qc.invalidateQueries({ queryKey: ["adjustments"] });
                               qc.invalidateQueries({ queryKey: ["products"] });
                             }
@@ -178,6 +178,7 @@ function AdjustmentsPage() {
 }
 
 function NewAdjustmentDialog({ onClose, userId }: { onClose: () => void; userId: string }) {
+  const { t } = useTranslation();
   const [products, setProducts] = useState<{ id: string; name: string; unit: string; stock: number }[]>(
     [],
   );
@@ -197,9 +198,9 @@ function NewAdjustmentDialog({ onClose, userId }: { onClose: () => void; userId:
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    if (!productId) return toast.error("Pilih produk");
-    if (!qty || Number(qty) === 0) return toast.error("Isi perubahan qty (tidak boleh 0)");
-    if (!reason.trim()) return toast.error("Isi alasan penyesuaian");
+    if (!productId) return toast.error(t("adjustments.errProduct"));
+    if (!qty || Number(qty) === 0) return toast.error(t("adjustments.errQty"));
+    if (!reason.trim()) return toast.error(t("adjustments.errReason"));
     setSaving(true);
     const { error } = await supabase.from("stock_adjustments").insert({
       user_id: userId,
@@ -210,26 +211,26 @@ function NewAdjustmentDialog({ onClose, userId }: { onClose: () => void; userId:
     });
     setSaving(false);
     if (error) return toast.error(error.message);
-    toast.success("Penyesuaian tersimpan");
+    toast.success(t("adjustments.saved"));
     onClose();
   }
 
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Penyesuaian Stok Baru</DialogTitle>
+        <DialogTitle>{t("adjustments.newTitle")}</DialogTitle>
       </DialogHeader>
       <form onSubmit={save} className="space-y-4">
         <div className="space-y-2">
-          <Label>Produk</Label>
+          <Label>{t("adjustments.product")}</Label>
           <Select value={productId} onValueChange={setProductId}>
             <SelectTrigger>
-              <SelectValue placeholder="Pilih produk" />
+              <SelectValue placeholder={t("adjustments.selectProduct")} />
             </SelectTrigger>
             <SelectContent>
               {products.map((p) => (
                 <SelectItem key={p.id} value={p.id}>
-                  {p.name} (stok {p.stock} {p.unit})
+                  {p.name} ({t("adjustments.stockOption", { n: p.stock, unit: p.unit })})
                 </SelectItem>
               ))}
             </SelectContent>
@@ -237,18 +238,18 @@ function NewAdjustmentDialog({ onClose, userId }: { onClose: () => void; userId:
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>Perubahan Qty (+/-)</Label>
+            <Label>{t("adjustments.qtyDelta")}</Label>
             <Input
               type="number"
               step="any"
               value={qty}
-              placeholder="-2 untuk kurangi, 5 untuk tambah"
+              placeholder={t("adjustments.qtyHint")}
               onChange={(e) => setQty(e.target.value === "" ? "" : Number(e.target.value))}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label>Tanggal</Label>
+            <Label>{t("common.date")}</Label>
             <Input
               type="date"
               value={date}
@@ -258,21 +259,21 @@ function NewAdjustmentDialog({ onClose, userId }: { onClose: () => void; userId:
           </div>
         </div>
         <div className="space-y-2">
-          <Label>Alasan</Label>
+          <Label>{t("adjustments.reason")}</Label>
           <Textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder="Pecah saat bongkar, hilang, opname fisik, dll."
+            placeholder={t("adjustments.reasonHint")}
             rows={2}
             required
           />
         </div>
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onClose}>
-            Batal
+            {t("common.cancel")}
           </Button>
           <Button type="submit" disabled={saving}>
-            {saving ? "Menyimpan…" : "Simpan"}
+            {saving ? t("common.saving") : t("common.save")}
           </Button>
         </DialogFooter>
       </form>

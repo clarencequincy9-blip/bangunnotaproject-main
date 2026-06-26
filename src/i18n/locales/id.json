@@ -10,7 +10,12 @@
     "actions": "Aksi", "name": "Nama", "phone": "Telepon", "address": "Alamat",
     "category": "Kategori", "saving": "Menyimpan…", "deleted": "Data dihapus",
     "confirmDelete": "Hapus data ini?", "new": "Baru", "filter": "Filter",
-    "from": "Dari", "to": "Sampai", "period": "Periode", "all": "Semua"
+    "from": "Dari", "to": "Sampai", "period": "Periode", "all": "Semua",
+    "failed": "Gagal", "qty": "Qty", "price": "Harga", "method": "Metode",
+    "remaining": "Sisa", "number": "Nomor", "subtotal": "Subtotal",
+    "discount": "Diskon", "deliveryFee": "Ongkos Kirim", "item": "Item",
+    "payment": "Pembayaran", "pdfDownloaded": "PDF diunduh",
+    "excelDownloaded": "Excel diunduh", "invoiceCol": "Invoice"
   },
   "nav": {
     "dashboard": "Dashboard Utama",
@@ -87,13 +92,19 @@
     "title": "Penjualan",
     "subtitle": "Catat dan lihat seluruh transaksi penjualan.",
     "new": "Penjualan Baru", "invoice": "No. Invoice",
-    "payMethod": "Metode Bayar", "noSales": "Belum ada transaksi penjualan."
+    "payMethod": "Metode Bayar", "noSales": "Belum ada transaksi penjualan.",
+    "exportTitle": "Daftar Penjualan", "exportFile": "Penjualan",
+    "balanceAR": "Saldo Piutang", "invoiceCount": "{{n}} faktur",
+    "deleteConfirm": "Hapus {{no}}?"
   },
   "purchases": {
     "title": "Pembelian",
     "subtitle": "Catat pembelian dari pemasok — stok otomatis bertambah.",
     "new": "Pembelian Baru", "invoice": "No. Nota",
-    "noPurchases": "Belum ada pembelian."
+    "noPurchases": "Belum ada pembelian.",
+    "exportTitle": "Daftar Pembelian", "exportFile": "Pembelian",
+    "balanceAP": "Saldo Hutang", "billCount": "{{n}} nota",
+    "deleteConfirm": "Hapus {{no}}?"
   },
   "expenses": {
     "title": "Beban Operasional",
@@ -124,7 +135,10 @@
     "apHelp": "{{count}} nota belum lunas",
     "tabAR": "Piutang", "tabAP": "Hutang",
     "addPayment": "Pelunasan", "pay": "Bayar", "settle": "Lunaskan",
-    "allSettled": "Semua sudah lunas 🎉"
+    "allSettled": "Semua sudah lunas 🎉",
+    "exportAR": "Ekspor Piutang", "exportAP": "Ekspor Hutang",
+    "payEnter": "Masukkan jumlah pembayaran", "payExceeds": "Pembayaran melebihi sisa",
+    "paymentRecorded": "Pelunasan tercatat"
   },
   "reports": {
     "title": "Laporan Keuangan",
@@ -139,14 +153,50 @@
     "endingBalance": "Saldo Akhir Periode",
     "tabDaily": "Harian", "tabAgingAR": "Umur Piutang",
     "tabAgingAP": "Umur Hutang", "tabPL": "Laba Rugi",
-    "tabAnnual": "Tahunan", "tabBalance": "Posisi Keuangan"
+    "tabAnnual": "Tahunan", "tabBalance": "Posisi Keuangan",
+    "printPL": "Cetak L/R", "cardSupplierPay": "Pembayaran Supplier",
+    "cardFuel": "Solar & Transportasi", "cardLabor": "Upah Muat & Gaji",
+    "agingAge": "Umur Keterlambatan", "action": "Tindakan",
+    "apAgingAge": "Umur Hutang ke Pemasok", "cashFlow": "Arus Kas Ringkas",
+    "openingCash": "Saldo Kas Awal Periode", "cashIn": "(+) Penerimaan Kas",
+    "cashOut": "(−) Pembayaran Pemasok & Beban",
+    "endingCash": "Saldo Kas Akhir Periode",
+    "financialPosition": "Posisi Keuangan (Saldo Akhir)",
+    "cash": "Kas & Setara Kas", "inventoryValueCogs": "Nilai Persediaan (HPP)",
+    "currentAssets": "Total Aset Lancar",
+    "carryNote": "Saldo awal periode berikutnya akan otomatis diambil dari nilai akhir periode ini.",
+    "plReport": "Laporan Laba / Rugi", "totalOpex": "Total Beban Operasional",
+    "expByCat": "Pengeluaran per Kategori",
+    "noExpInPeriod": "Belum ada pengeluaran pada periode ini.",
+    "profitByCat": "Kontribusi Laba per Kategori",
+    "noCatData": "Belum ada data kategori produk.",
+    "annualPerf": "Kinerja Tahunan / Periode Terpilih",
+    "annualDesc": "Laba operasional aktual berdasarkan transaksi pada periode, tanpa angka proyeksi simulasi.",
+    "netMargin": "Margin laba bersih:", "uncategorized": "Tanpa Kategori",
+    "plTitle": "Laporan Laba Rugi", "periodLabel": "Periode {{from}} s/d {{to}}",
+    "netLossUpper": "LABA / RUGI BERSIH", "amountRp": "Jumlah (Rp)",
+    "age0": "0–14 hari", "age1": "15–30 hari", "age2": "> 30 hari",
+    "actSupplyOk": "Supply lancar", "actSendReminder": "Kirim pengingat tagihan",
+    "actReviewCredit": "Tinjau penghentian kredit",
+    "actSchedule": "Jadwalkan pelunasan", "actContactSupplier": "Hubungi pemasok",
+    "actRenegotiate": "Negosiasi ulang termin"
   },
   "adjustments": {
     "title": "Penyesuaian Stok",
     "subtitle": "Koreksi stok karena kerusakan, kehilangan, atau opname fisik.",
     "new": "Penyesuaian Baru",
     "qtyDelta": "Perubahan Qty (+/-)",
-    "reason": "Alasan", "product": "Produk"
+    "reason": "Alasan", "product": "Produk",
+    "exportRecords": "Total {{n}} catatan", "change": "Perubahan",
+    "noAdjustments": "Belum ada penyesuaian.",
+    "deleteConfirm": "Hapus penyesuaian ini? Stok akan dikembalikan.",
+    "newTitle": "Penyesuaian Stok Baru", "selectProduct": "Pilih produk",
+    "stockOption": "stok {{n}} {{unit}}",
+    "qtyHint": "-2 untuk kurangi, 5 untuk tambah",
+    "reasonHint": "Pecah saat bongkar, hilang, opname fisik, dll.",
+    "errProduct": "Pilih produk",
+    "errQty": "Isi perubahan qty (tidak boleh 0)",
+    "errReason": "Isi alasan penyesuaian", "saved": "Penyesuaian tersimpan"
   },
   "mutation": {
     "title": "Mutasi Persediaan",
@@ -166,6 +216,7 @@
     "subtitle": "Kelola preferensi akun dan data toko Anda.",
     "profile": "Profil Akun",
     "language": "Bahasa Aplikasi",
+    "langHint": "Preferensi tersimpan di perangkat ini. Tambah bahasa baru via",
     "danger": "Zona Berbahaya — Reset Data",
     "dangerHint": "Hapus seluruh data transaksi & inventaris toko Anda. Tindakan ini tidak dapat dibatalkan.",
     "userId": "ID Pengguna",
@@ -193,5 +244,41 @@
       "contacts": "Pelanggan & Pemasok",
       "contactsDesc": "Semua pelanggan, batas kredit, dan pemasok"
     }
+  },
+  "tx": {
+    "saleTitle": "Transaksi Penjualan Baru",
+    "purchaseTitle": "Transaksi Pembelian Baru",
+    "minItem": "Tambahkan minimal 1 item",
+    "insufficientStock": "Stok {{name}} tidak mencukupi",
+    "productFallback": "produk",
+    "selectCustomerCredit": "Pilih pelanggan untuk transaksi tempo",
+    "overCredit": "Transaksi melewati sisa batas kredit pelanggan",
+    "saleSaved": "Penjualan tersimpan",
+    "purchaseSaved": "Pembelian tersimpan, stok diperbarui",
+    "selectSupplier": "Pilih supplier",
+    "errSupplier": "Pilih supplier",
+    "errDueDate": "Isi tanggal jatuh tempo",
+    "customer": "Pelanggan / Kontraktor",
+    "selectCustomer": "Pilih pelanggan (opsional untuk tunai)",
+    "limit": "Limit",
+    "remainingCredit": "Sisa kredit",
+    "selectProduct": "Pilih produk",
+    "addItem": "Tambah Item",
+    "cash": "Tunai",
+    "transfer": "Transfer",
+    "credit": "Tempo",
+    "creditDebt": "Tempo / Hutang",
+    "amountPaid": "Jumlah Dibayar",
+    "emptyPaidHint": "Kosongkan = lunas.",
+    "dueDateDebt": "Jatuh Tempo Sisa Hutang",
+    "summary": "Subtotal: {{sub}} · Diskon: {{disc}} · Ongkir: {{del}}",
+    "debt": "Hutang",
+    "lockedOverCredit": "Transaksi dikunci: melebihi sisa batas kredit.",
+    "saveTransaction": "Simpan Transaksi",
+    "savePurchase": "Simpan Pembelian",
+    "supplier": "Supplier / Distributor",
+    "costPlaceholder": "HPP / Cost",
+    "outstanding": "Piutang",
+    "productOption": "{{unit}}, stok {{stock}}"
   }
 }

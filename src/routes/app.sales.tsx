@@ -53,15 +53,15 @@ function SalesPage() {
         <div className="flex gap-2 shrink-0">
         <ExportMenu
           spec={() => ({
-            title: "Daftar Penjualan",
-            subtitle: `${sales.length} faktur`,
-            filename: "Penjualan",
-            head: ["Tanggal", "Invoice", "Metode", "Status", "Jatuh Tempo", "Total", "Dibayar", "Saldo Piutang"],
+            title: t("sales.exportTitle"),
+            subtitle: t("sales.invoiceCount", { n: sales.length }),
+            filename: t("sales.exportFile"),
+            head: [t("common.date"), t("common.invoiceCol"), t("common.method"), t("common.status"), t("common.dueDate"), t("common.total"), t("common.paid"), t("sales.balanceAR")],
             body: sales.map((s) => [
               s.sale_date,
               s.invoice_no,
               s.payment_method,
-              Number(s.total) - Number(s.paid) < 0.01 ? "Lunas" : "Piutang",
+              Number(s.total) - Number(s.paid) < 0.01 ? t("common.paidOff") : t("receivables.tabAR"),
               s.due_date ?? "",
               Number(s.total),
               Number(s.paid),
@@ -80,8 +80,8 @@ function SalesPage() {
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="gap-2">
-              <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Penjualan Baru</span>
-              <span className="sm:hidden">Baru</span>
+              <Plus className="h-4 w-4" /> <span className="hidden sm:inline">{t("sales.new")}</span>
+              <span className="sm:hidden">{t("common.new")}</span>
             </Button>
           </DialogTrigger>
           <NewSaleDialog
@@ -103,12 +103,12 @@ function SalesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Tanggal</TableHead>
-                  <TableHead>Invoice</TableHead>
-                  <TableHead className="hidden sm:table-cell">Pembayaran</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="hidden md:table-cell">Jatuh Tempo</TableHead>
-                  <TableHead className="text-right">Total</TableHead>
+                  <TableHead>{t("common.date")}</TableHead>
+                  <TableHead>{t("common.invoiceCol")}</TableHead>
+                  <TableHead className="hidden sm:table-cell">{t("common.payment")}</TableHead>
+                  <TableHead>{t("common.status")}</TableHead>
+                  <TableHead className="hidden md:table-cell">{t("common.dueDate")}</TableHead>
+                  <TableHead className="text-right">{t("common.total")}</TableHead>
                   <TableHead className="w-16"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -116,7 +116,7 @@ function SalesPage() {
                 {sales.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
-                      Belum ada transaksi penjualan.
+                      {t("sales.noSales")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -134,10 +134,10 @@ function SalesPage() {
                         <TableCell>
                           {lunas ? (
                             <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">
-                              Lunas
+                              {t("common.paidOff")}
                             </Badge>
                           ) : (
-                            <Badge variant="destructive">Piutang</Badge>
+                            <Badge variant="destructive">{t("receivables.tabAR")}</Badge>
                           )}
                         </TableCell>
                         <TableCell className="hidden whitespace-nowrap md:table-cell">
@@ -151,14 +151,14 @@ function SalesPage() {
                             size="icon"
                             variant="ghost"
                             onClick={async () => {
-                              if (!confirm(`Hapus ${s.invoice_no}?`)) return;
+                              if (!confirm(t("sales.deleteConfirm", { no: s.invoice_no }))) return;
                               const { error } = await supabase
                                 .from("sales")
                                 .delete()
                                 .eq("id", s.id);
                               if (error) toast.error(error.message);
                               else {
-                                toast.success("Dihapus");
+                                toast.success(t("common.deleted"));
                                 qc.invalidateQueries({ queryKey: ["sales"] });
                                 qc.invalidateQueries({ queryKey: ["products"] });
                               }

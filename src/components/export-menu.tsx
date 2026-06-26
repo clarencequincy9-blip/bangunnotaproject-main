@@ -8,6 +8,7 @@ import {
 import { Download, FileSpreadsheet, FileText, Printer } from "lucide-react";
 import { exportExcel, exportPDF, printDocument, tableHtml } from "@/lib/export";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 export type ExportSpec = {
   title: string;
@@ -19,12 +20,13 @@ export type ExportSpec = {
   totalRow?: (string | number)[];
 };
 
-export function ExportMenu({ spec, label = "Ekspor" }: { spec: () => ExportSpec; label?: string }) {
+export function ExportMenu({ spec, label }: { spec: () => ExportSpec; label?: string }) {
+  const { t } = useTranslation();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="gap-2">
-          <Download className="h-4 w-4" /> {label}
+          <Download className="h-4 w-4" /> {label ?? t("common.export")}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -43,7 +45,7 @@ export function ExportMenu({ spec, label = "Ekspor" }: { spec: () => ExportSpec;
             );
           }}
         >
-          <Printer className="mr-2 h-4 w-4" /> Cetak
+          <Printer className="mr-2 h-4 w-4" /> {t("common.print")}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
@@ -56,10 +58,10 @@ export function ExportMenu({ spec, label = "Ekspor" }: { spec: () => ExportSpec;
               filename: `${s.filename}.pdf`,
               footer: s.subtitle,
             });
-            toast.success("PDF diunduh");
+            toast.success(t("common.pdfDownloaded"));
           }}
         >
-          <FileText className="mr-2 h-4 w-4" /> Ekspor PDF
+          <FileText className="mr-2 h-4 w-4" /> {t("common.exportPdf")}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
@@ -71,10 +73,10 @@ export function ExportMenu({ spec, label = "Ekspor" }: { spec: () => ExportSpec;
                 cols: s.cols,
               },
             ]);
-            toast.success("Excel diunduh");
+            toast.success(t("common.excelDownloaded"));
           }}
         >
-          <FileSpreadsheet className="mr-2 h-4 w-4" /> Ekspor Excel
+          <FileSpreadsheet className="mr-2 h-4 w-4" /> {t("common.exportExcel")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -140,7 +140,7 @@ function SettingsPage() {
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              Preferensi tersimpan di perangkat ini. Tambah bahasa baru via{" "}
+              {t("settings.langHint")}{" "}
               <code>src/i18n/locales</code>.
             </p>
           </div>

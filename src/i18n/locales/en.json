@@ -10,7 +10,12 @@
     "actions": "Actions", "name": "Name", "phone": "Phone", "address": "Address",
     "category": "Category", "saving": "Saving…", "deleted": "Deleted",
     "confirmDelete": "Delete this item?", "new": "New", "filter": "Filter",
-    "from": "From", "to": "To", "period": "Period", "all": "All"
+    "from": "From", "to": "To", "period": "Period", "all": "All",
+    "failed": "Failed", "qty": "Qty", "price": "Price", "method": "Method",
+    "remaining": "Remaining", "number": "No.", "subtotal": "Subtotal",
+    "discount": "Discount", "deliveryFee": "Delivery Fee", "item": "Item",
+    "payment": "Payment", "pdfDownloaded": "PDF downloaded",
+    "excelDownloaded": "Excel downloaded", "invoiceCol": "Invoice"
   },
   "nav": {
     "dashboard": "Main Dashboard",
@@ -87,13 +92,19 @@
     "title": "Sales",
     "subtitle": "Record and view all sales transactions.",
     "new": "New Sale", "invoice": "Invoice No.",
-    "payMethod": "Payment Method", "noSales": "No sales transactions yet."
+    "payMethod": "Payment Method", "noSales": "No sales transactions yet.",
+    "exportTitle": "Sales List", "exportFile": "Sales",
+    "balanceAR": "AR Balance", "invoiceCount": "{{n}} invoices",
+    "deleteConfirm": "Delete {{no}}?"
   },
   "purchases": {
     "title": "Purchases",
     "subtitle": "Record purchases from suppliers — stock increases automatically.",
     "new": "New Purchase", "invoice": "Bill No.",
-    "noPurchases": "No purchases yet."
+    "noPurchases": "No purchases yet.",
+    "exportTitle": "Purchase List", "exportFile": "Purchases",
+    "balanceAP": "AP Balance", "billCount": "{{n}} bills",
+    "deleteConfirm": "Delete {{no}}?"
   },
   "expenses": {
     "title": "Operating Expenses",
@@ -124,7 +135,10 @@
     "apHelp": "{{count}} unpaid bills",
     "tabAR": "Receivables", "tabAP": "Payables",
     "addPayment": "Settle", "pay": "Pay", "settle": "Pay Off",
-    "allSettled": "All settled 🎉"
+    "allSettled": "All settled 🎉",
+    "exportAR": "Export Receivables", "exportAP": "Export Payables",
+    "payEnter": "Enter payment amount", "payExceeds": "Payment exceeds balance",
+    "paymentRecorded": "Payment recorded"
   },
   "reports": {
     "title": "Financial Reports",
@@ -139,14 +153,50 @@
     "endingBalance": "Ending Balance",
     "tabDaily": "Daily", "tabAgingAR": "AR Aging",
     "tabAgingAP": "AP Aging", "tabPL": "Profit & Loss",
-    "tabAnnual": "Annual", "tabBalance": "Financial Position"
+    "tabAnnual": "Annual", "tabBalance": "Financial Position",
+    "printPL": "Print P/L", "cardSupplierPay": "Supplier Payments",
+    "cardFuel": "Fuel & Transport", "cardLabor": "Labor & Salary",
+    "agingAge": "Overdue Age", "action": "Action",
+    "apAgingAge": "Supplier Debt Age", "cashFlow": "Cash Flow Summary",
+    "openingCash": "Opening Cash Balance", "cashIn": "(+) Cash Receipts",
+    "cashOut": "(−) Supplier & Expense Payments",
+    "endingCash": "Ending Cash Balance",
+    "financialPosition": "Financial Position (Ending)",
+    "cash": "Cash & Equivalents", "inventoryValueCogs": "Inventory Value (COGS)",
+    "currentAssets": "Total Current Assets",
+    "carryNote": "Next period's opening balance is auto-carried from this period's ending value.",
+    "plReport": "Profit & Loss Report", "totalOpex": "Total Operating Expenses",
+    "expByCat": "Expenses by Category",
+    "noExpInPeriod": "No expenses in this period yet.",
+    "profitByCat": "Profit Contribution by Category",
+    "noCatData": "No product category data yet.",
+    "annualPerf": "Annual / Selected Period Performance",
+    "annualDesc": "Actual operating profit based on period transactions, no simulated projections.",
+    "netMargin": "Net profit margin:", "uncategorized": "Uncategorized",
+    "plTitle": "Profit & Loss Report", "periodLabel": "Period {{from}} to {{to}}",
+    "netLossUpper": "NET PROFIT / LOSS", "amountRp": "Amount (Rp)",
+    "age0": "0–14 days", "age1": "15–30 days", "age2": "> 30 days",
+    "actSupplyOk": "Supply on track", "actSendReminder": "Send billing reminder",
+    "actReviewCredit": "Review credit suspension",
+    "actSchedule": "Schedule settlement", "actContactSupplier": "Contact supplier",
+    "actRenegotiate": "Renegotiate terms"
   },
   "adjustments": {
     "title": "Stock Adjustments",
     "subtitle": "Correct stock due to damage, loss, or physical count.",
     "new": "New Adjustment",
     "qtyDelta": "Qty Change (+/-)",
-    "reason": "Reason", "product": "Product"
+    "reason": "Reason", "product": "Product",
+    "exportRecords": "Total {{n}} records", "change": "Change",
+    "noAdjustments": "No adjustments yet.",
+    "deleteConfirm": "Delete this adjustment? Stock will be restored.",
+    "newTitle": "New Stock Adjustment", "selectProduct": "Select product",
+    "stockOption": "stock {{n}} {{unit}}",
+    "qtyHint": "-2 to reduce, 5 to add",
+    "reasonHint": "Damaged during unloading, lost, stock count, etc.",
+    "errProduct": "Select a product",
+    "errQty": "Enter qty change (cannot be 0)",
+    "errReason": "Enter adjustment reason", "saved": "Adjustment saved"
   },
   "mutation": {
     "title": "Inventory Mutation",
@@ -166,6 +216,7 @@
     "subtitle": "Manage account preferences and your store data.",
     "profile": "Account Profile",
     "language": "Application Language",
+    "langHint": "Saved on this device. Add new languages via",
     "danger": "Danger Zone — Reset Data",
     "dangerHint": "Erase all your store's transactions and inventory. This action cannot be undone.",
     "userId": "User ID",
@@ -193,5 +244,41 @@
       "contacts": "Customers & Suppliers",
       "contactsDesc": "All customers, credit limits, and suppliers"
     }
+  },
+  "tx": {
+    "saleTitle": "New Sales Transaction",
+    "purchaseTitle": "New Purchase Transaction",
+    "minItem": "Add at least 1 item",
+    "insufficientStock": "Insufficient stock for {{name}}",
+    "productFallback": "product",
+    "selectCustomerCredit": "Select a customer for credit transaction",
+    "overCredit": "Transaction exceeds customer's remaining credit limit",
+    "saleSaved": "Sale saved",
+    "purchaseSaved": "Purchase saved, stock updated",
+    "selectSupplier": "Select supplier",
+    "errSupplier": "Select a supplier",
+    "errDueDate": "Enter due date",
+    "customer": "Customer / Contractor",
+    "selectCustomer": "Select customer (optional for cash)",
+    "limit": "Limit",
+    "remainingCredit": "Remaining credit",
+    "selectProduct": "Select product",
+    "addItem": "Add Item",
+    "cash": "Cash",
+    "transfer": "Transfer",
+    "credit": "Credit",
+    "creditDebt": "Credit / Debt",
+    "amountPaid": "Amount Paid",
+    "emptyPaidHint": "Empty = paid in full.",
+    "dueDateDebt": "Due Date for Remaining Debt",
+    "summary": "Subtotal: {{sub}} · Discount: {{disc}} · Delivery: {{del}}",
+    "debt": "Debt",
+    "lockedOverCredit": "Transaction locked: exceeds remaining credit limit.",
+    "saveTransaction": "Save Transaction",
+    "savePurchase": "Save Purchase",
+    "supplier": "Supplier / Distributor",
+    "costPlaceholder": "COGS / Cost",
+    "outstanding": "Receivables",
+    "productOption": "{{unit}}, stock {{stock}}"
   }
 }

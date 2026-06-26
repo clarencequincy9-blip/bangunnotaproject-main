@@ -15,6 +15,7 @@ import {
 import { Trash2, Plus } from "lucide-react";
 import { idr, today } from "@/lib/format";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 type Product = {
   id: string;
@@ -34,6 +35,7 @@ function addDays(date: string, days: number) {
 }
 
 export function NewSaleDialog({ onClose, userId }: { onClose: () => void; userId: string }) {
+  const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [customerId, setCustomerId] = useState("");
@@ -99,18 +101,18 @@ export function NewSaleDialog({ onClose, userId }: { onClose: () => void; userId
   async function save(e: React.FormEvent) {
     e.preventDefault();
     const valid = items.filter((i) => i.product_id && i.qty > 0);
-    if (valid.length === 0) return toast.error("Tambahkan minimal 1 item");
+    if (valid.length === 0) return toast.error(t("tx.minItem"));
     for (const item of valid) {
       const product = products.find((entry) => entry.id === item.product_id);
       const totalQty = valid
         .filter((entry) => entry.product_id === item.product_id)
         .reduce((sum, entry) => sum + entry.qty, 0);
       if (!product || totalQty > Number(product.stock))
-        return toast.error(`Stok ${product?.name ?? "produk"} tidak mencukupi`);
+        return toast.error(t("tx.insufficientStock", { name: product?.name ?? t("tx.productFallback") }));
     }
     if (payment === "credit" && !customerId)
-      return toast.error("Pilih pelanggan untuk transaksi tempo");
-    if (overCreditLimit) return toast.error("Transaksi melewati sisa batas kredit pelanggan");
+      return toast.error(t("tx.selectCustomerCredit"));
+    if (overCreditLimit) return toast.error(t("tx.overCredit"));
     setSaving(true);
     const { data: sale, error } = await supabase
       .from("sales")
@@ -135,7 +137,7 @@ export function NewSaleDialog({ onClose, userId }: { onClose: () => void; userId
       .single();
     if (error || !sale) {
       setSaving(false);
-      return toast.error(error?.message ?? "Gagal");
+      return toast.error(error?.message ?? t("common.failed"));
     }
     const { error: e2 } = await supabase.from("sale_items").insert(
       valid.map((i) => ({
@@ -149,28 +151,28 @@ export function NewSaleDialog({ onClose, userId }: { onClose: () => void; userId
     );
     setSaving(false);
     if (e2) return toast.error(e2.message);
-    toast.success("Penjualan tersimpan");
+    toast.success(t("tx.saleSaved"));
     onClose();
   }
 
   return (
     <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>Transaksi Penjualan Baru</DialogTitle>
+        <DialogTitle>{t("tx.saleTitle")}</DialogTitle>
       </DialogHeader>
       <form onSubmit={save} className="space-y-4">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
           <div className="space-y-2">
-            <Label>No. Invoice</Label>
+            <Label>{t("sales.invoice")}</Label>
             <Input value={invoice} onChange={(e) => setInvoice(e.target.value)} required />
           </div>
           <div className="space-y-2">
-            <Label>Tanggal</Label>
+            <Label>{t("common.date")}</Label>
             <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
           </div>
         </div>
         <div className="space-y-2">
-          <Label>Pelanggan / Kontraktor</Label>
+          <Label>{t("tx.customer")}</Label>
           <Select
             value={customerId}
             onValueChange={(value) => {
@@ -181,7 +183,7 @@ export function NewSaleDialog({ onClose, userId }: { onClose: () => void; userId
             }}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Pilih pelanggan (opsional untuk tunai)" />
+              <SelectValue placeholder={t("tx.selectCustomer")} />
             </SelectTrigger>
             <SelectContent>
               {customers.map((entry) => (
@@ -194,17 +196,17 @@ export function NewSaleDialog({ onClose, userId }: { onClose: () => void; userId
           {customer && (
             <div className="grid grid-cols-3 gap-2 rounded-md border bg-muted/30 p-3 text-xs">
               <span>
-                Limit
+                {t("tx.limit")}
                 <br />
                 <strong>{idr(customer.credit_limit)}</strong>
               </span>
               <span>
-                Piutang
+                {t("contacts.receivable")}
                 <br />
                 <strong>{idr(customerOutstanding)}</strong>
               </span>
               <span>
-                Sisa kredit
+                {t("tx.remainingCredit")}
                 <br />
                 <strong className={overCreditLimit ? "text-destructive" : "text-primary"}>
                   {idr(remainingCredit)}
@@ -214,7 +216,7 @@ export function NewSaleDialog({ onClose, userId }: { onClose: () => void; userId
           )}
         </div>
         <div className="space-y-2">
-          <Label>Item</Label>
+          <Label>{t("common.item")}</Label>
           <div className="space-y-2">
             {items.map((it, idx) => (
               <div
@@ -234,7 +236,7 @@ export function NewSaleDialog({ onClose, userId }: { onClose: () => void; userId
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Pilih produk" />
+                      <SelectValue placeholder={t("tx.selectProduct")} />
                     </SelectTrigger>
                     <SelectContent>
                       {products.map((p) => (
@@ -249,7 +251,7 @@ export function NewSaleDialog({ onClose, userId }: { onClose: () => void; userId
                   <Input
                     type="number"
                     step="any"
-                    placeholder="Qty"
+                    placeholder={t("common.qty")}
                     value={it.qty}
                     onChange={(e) => updateItem(idx, { qty: Number(e.target.value) })}
                   />
@@ -257,7 +259,7 @@ export function NewSaleDialog({ onClose, userId }: { onClose: () => void; userId
                 <div className="col-span-7 sm:col-span-3">
                   <Input
                     type="number"
-                    placeholder="Harga"
+                    placeholder={t("common.price")}
                     value={it.price}
                     onChange={(e) => updateItem(idx, { price: Number(e.target.value) })}
                   />
@@ -272,7 +274,7 @@ export function NewSaleDialog({ onClose, userId }: { onClose: () => void; userId
                   <Trash2 className="h-4 w-4" />
                 </Button>
                 <div className="col-span-12 text-right text-xs text-muted-foreground sm:hidden">
-                  Subtotal: {idr(it.qty * it.price)}
+                  {t("common.subtotal")}: {idr(it.qty * it.price)}
                 </div>
               </div>
             ))}
@@ -284,12 +286,12 @@ export function NewSaleDialog({ onClose, userId }: { onClose: () => void; userId
             className="gap-1"
             onClick={() => setItems((a) => [...a, { product_id: "", qty: 1, price: 0, cost: 0 }])}
           >
-            <Plus className="h-4 w-4" /> Tambah Item
+            <Plus className="h-4 w-4" /> {t("tx.addItem")}
           </Button>
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 sm:gap-4">
           <div className="space-y-2">
-            <Label>Diskon</Label>
+            <Label>{t("common.discount")}</Label>
             <Input
               type="number"
               value={discount}
@@ -297,7 +299,7 @@ export function NewSaleDialog({ onClose, userId }: { onClose: () => void; userId
             />
           </div>
           <div className="space-y-2">
-            <Label>Ongkos Kirim</Label>
+            <Label>{t("common.deliveryFee")}</Label>
             <Input
               type="number"
               min="0"
@@ -306,7 +308,7 @@ export function NewSaleDialog({ onClose, userId }: { onClose: () => void; userId
             />
           </div>
           <div className="space-y-2">
-            <Label>Metode Bayar</Label>
+            <Label>{t("sales.payMethod")}</Label>
             <Select
               value={payment}
               onValueChange={(value) => {
@@ -319,27 +321,27 @@ export function NewSaleDialog({ onClose, userId }: { onClose: () => void; userId
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="cash">Tunai</SelectItem>
-                <SelectItem value="transfer">Transfer</SelectItem>
+                <SelectItem value="cash">{t("tx.cash")}</SelectItem>
+                <SelectItem value="transfer">{t("tx.transfer")}</SelectItem>
                 <SelectItem value="qris">QRIS</SelectItem>
-                <SelectItem value="credit">Tempo</SelectItem>
+                <SelectItem value="credit">{t("tx.credit")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Jumlah Dibayar</Label>
+            <Label>{t("tx.amountPaid")}</Label>
             <Input
               type="number"
               placeholder={`${total}`}
               value={paid}
               onChange={(e) => setPaid(e.target.value === "" ? "" : Number(e.target.value))}
             />
-            <p className="text-xs text-muted-foreground">Kosongkan = lunas.</p>
+            <p className="text-xs text-muted-foreground">{t("tx.emptyPaidHint")}</p>
           </div>
         </div>
         {payment === "credit" && (
           <div className="space-y-2">
-            <Label>Jatuh Tempo</Label>
+            <Label>{t("common.dueDate")}</Label>
             <Input
               type="date"
               required
@@ -349,31 +351,31 @@ export function NewSaleDialog({ onClose, userId }: { onClose: () => void; userId
           </div>
         )}
         <div className="space-y-2">
-          <Label>Catatan</Label>
+          <Label>{t("common.notes")}</Label>
           <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
         </div>
         <div className="rounded-lg border bg-muted/40 p-4 text-right">
           <div className="text-sm text-muted-foreground">
-            Subtotal: {idr(subtotal)} · Diskon: {idr(discount)} · Ongkir: {idr(deliveryFee)}
+            {t("tx.summary", { sub: idr(subtotal), disc: idr(discount), del: idr(deliveryFee) })}
           </div>
-          <div className="text-xl font-bold sm:text-2xl">Total: {idr(total)}</div>
+          <div className="text-xl font-bold sm:text-2xl">{t("common.total")}: {idr(total)}</div>
           {outstanding > 0 && (
             <div className="text-sm font-semibold text-destructive">
-              Piutang: {idr(outstanding)}
+              {t("contacts.receivable")}: {idr(outstanding)}
             </div>
           )}
           {overCreditLimit && (
             <div className="mt-1 text-sm font-semibold text-destructive">
-              Transaksi dikunci: melebihi sisa batas kredit.
+              {t("tx.lockedOverCredit")}
             </div>
           )}
         </div>
         <DialogFooter className="flex-col gap-2 sm:flex-row">
           <Button type="button" variant="outline" onClick={onClose}>
-            Batal
+            {t("common.cancel")}
           </Button>
           <Button type="submit" disabled={saving || overCreditLimit}>
-            {saving ? "Menyimpan…" : "Simpan Transaksi"}
+            {saving ? t("common.saving") : t("tx.saveTransaction")}
           </Button>
         </DialogFooter>
       </form>
@@ -382,6 +384,7 @@ export function NewSaleDialog({ onClose, userId }: { onClose: () => void; userId
 }
 
 export function NewPurchaseDialog({ onClose, userId }: { onClose: () => void; userId: string }) {
+  const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [supplierId, setSupplierId] = useState("");
@@ -420,9 +423,9 @@ export function NewPurchaseDialog({ onClose, userId }: { onClose: () => void; us
   async function save(e: React.FormEvent) {
     e.preventDefault();
     const valid = items.filter((i) => i.product_id && i.qty > 0);
-    if (valid.length === 0) return toast.error("Tambahkan minimal 1 item");
-    if (!supplierId) return toast.error("Pilih supplier");
-    if (payment === "credit" && !dueDate) return toast.error("Isi tanggal jatuh tempo");
+    if (valid.length === 0) return toast.error(t("tx.minItem"));
+    if (!supplierId) return toast.error(t("tx.errSupplier"));
+    if (payment === "credit" && !dueDate) return toast.error(t("tx.errDueDate"));
     setSaving(true);
     const { data: po, error } = await supabase
       .from("purchases")
@@ -441,7 +444,7 @@ export function NewPurchaseDialog({ onClose, userId }: { onClose: () => void; us
       .single();
     if (error || !po) {
       setSaving(false);
-      return toast.error(error?.message ?? "Gagal");
+      return toast.error(error?.message ?? t("common.failed"));
     }
     const { error: e2 } = await supabase.from("purchase_items").insert(
       valid.map((i) => ({
@@ -454,31 +457,31 @@ export function NewPurchaseDialog({ onClose, userId }: { onClose: () => void; us
     );
     setSaving(false);
     if (e2) return toast.error(e2.message);
-    toast.success("Pembelian tersimpan, stok diperbarui");
+    toast.success(t("tx.purchaseSaved"));
     onClose();
   }
 
   return (
     <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>Transaksi Pembelian Baru</DialogTitle>
+        <DialogTitle>{t("tx.purchaseTitle")}</DialogTitle>
       </DialogHeader>
       <form onSubmit={save} className="space-y-4">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
           <div className="space-y-2">
-            <Label>No. Nota</Label>
+            <Label>{t("purchases.invoice")}</Label>
             <Input value={invoice} onChange={(e) => setInvoice(e.target.value)} required />
           </div>
           <div className="space-y-2">
-            <Label>Tanggal</Label>
+            <Label>{t("common.date")}</Label>
             <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
           </div>
         </div>
         <div className="space-y-2">
-          <Label>Supplier / Distributor</Label>
+          <Label>{t("tx.supplier")}</Label>
           <Select value={supplierId} onValueChange={setSupplierId}>
             <SelectTrigger>
-              <SelectValue placeholder="Pilih supplier" />
+              <SelectValue placeholder={t("tx.selectSupplier")} />
             </SelectTrigger>
             <SelectContent>
               {suppliers.map((entry) => (
@@ -490,7 +493,7 @@ export function NewPurchaseDialog({ onClose, userId }: { onClose: () => void; us
           </Select>
         </div>
         <div className="space-y-2">
-          <Label>Item</Label>
+          <Label>{t("common.item")}</Label>
           {items.map((it, idx) => (
             <div
               key={idx}
@@ -505,7 +508,7 @@ export function NewPurchaseDialog({ onClose, userId }: { onClose: () => void; us
                   }}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih produk" />
+                    <SelectValue placeholder={t("tx.selectProduct")} />
                   </SelectTrigger>
                   <SelectContent>
                     {products.map((p) => (
@@ -520,7 +523,7 @@ export function NewPurchaseDialog({ onClose, userId }: { onClose: () => void; us
                 <Input
                   type="number"
                   step="any"
-                  placeholder="Qty"
+                  placeholder={t("common.qty")}
                   value={it.qty}
                   onChange={(e) => updateItem(idx, { qty: Number(e.target.value) })}
                 />
@@ -528,7 +531,7 @@ export function NewPurchaseDialog({ onClose, userId }: { onClose: () => void; us
               <div className="col-span-7 sm:col-span-3">
                 <Input
                   type="number"
-                  placeholder="HPP / Cost"
+                  placeholder={t("tx.costPlaceholder")}
                   value={it.cost}
                   onChange={(e) => updateItem(idx, { cost: Number(e.target.value) })}
                 />
@@ -551,12 +554,12 @@ export function NewPurchaseDialog({ onClose, userId }: { onClose: () => void; us
             className="gap-1"
             onClick={() => setItems((a) => [...a, { product_id: "", qty: 1, cost: 0 }])}
           >
-            <Plus className="h-4 w-4" /> Tambah Item
+            <Plus className="h-4 w-4" /> {t("tx.addItem")}
           </Button>
         </div>
         {payment === "credit" && (
           <div className="space-y-2">
-            <Label>Jatuh Tempo Sisa Hutang</Label>
+            <Label>{t("tx.dueDateDebt")}</Label>
             <Input
               type="date"
               required
@@ -567,45 +570,45 @@ export function NewPurchaseDialog({ onClose, userId }: { onClose: () => void; us
         )}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
           <div className="space-y-2">
-            <Label>Metode Bayar</Label>
+            <Label>{t("sales.payMethod")}</Label>
             <Select value={payment} onValueChange={setPayment}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="cash">Tunai</SelectItem>
-                <SelectItem value="transfer">Transfer</SelectItem>
-                <SelectItem value="credit">Tempo / Hutang</SelectItem>
+                <SelectItem value="cash">{t("tx.cash")}</SelectItem>
+                <SelectItem value="transfer">{t("tx.transfer")}</SelectItem>
+                <SelectItem value="credit">{t("tx.creditDebt")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Jumlah Dibayar</Label>
+            <Label>{t("tx.amountPaid")}</Label>
             <Input
               type="number"
               placeholder={`${total}`}
               value={paid}
               onChange={(e) => setPaid(e.target.value === "" ? "" : Number(e.target.value))}
             />
-            <p className="text-xs text-muted-foreground">Kosongkan = lunas.</p>
+            <p className="text-xs text-muted-foreground">{t("tx.emptyPaidHint")}</p>
           </div>
         </div>
         <div className="space-y-2">
-          <Label>Catatan</Label>
+          <Label>{t("common.notes")}</Label>
           <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
         </div>
         <div className="rounded-lg border bg-muted/40 p-4 text-right">
-          <div className="text-xl font-bold sm:text-2xl">Total: {idr(total)}</div>
+          <div className="text-xl font-bold sm:text-2xl">{t("common.total")}: {idr(total)}</div>
           {outstanding > 0 && (
-            <div className="text-sm font-semibold text-destructive">Hutang: {idr(outstanding)}</div>
+            <div className="text-sm font-semibold text-destructive">{t("tx.debt")}: {idr(outstanding)}</div>
           )}
         </div>
         <DialogFooter className="flex-col gap-2 sm:flex-row">
           <Button type="button" variant="outline" onClick={onClose}>
-            Batal
+            {t("common.cancel")}
           </Button>
           <Button type="submit" disabled={saving}>
-            {saving ? "Menyimpan…" : "Simpan Pembelian"}
+            {saving ? t("common.saving") : t("tx.savePurchase")}
           </Button>
         </DialogFooter>
       </form>

@@ -58,14 +58,14 @@ function ReceivablesPage() {
           <CardContent className="p-5">
             <div className="text-sm text-muted-foreground">{t("receivables.totalAR")}</div>
             <div className="mt-2 text-2xl font-bold text-emerald-600">{idr(totalAR)}</div>
-            <div className="mt-1 text-xs text-muted-foreground">{ar.length} faktur belum lunas</div>
+            <div className="mt-1 text-xs text-muted-foreground">{t("receivables.arHelp", { count: ar.length })}</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-5">
-            <div className="text-sm text-muted-foreground">Total Hutang Usaha</div>
+            <div className="text-sm text-muted-foreground">{t("receivables.totalAP")}</div>
             <div className="mt-2 text-2xl font-bold text-destructive">{idr(totalAP)}</div>
-            <div className="mt-1 text-xs text-muted-foreground">{ap.length} nota belum lunas</div>
+            <div className="mt-1 text-xs text-muted-foreground">{t("receivables.apHelp", { count: ap.length })}</div>
           </CardContent>
         </Card>
       </div>
@@ -73,16 +73,16 @@ function ReceivablesPage() {
       <Tabs defaultValue="ar">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <TabsList className="grid w-full grid-cols-2 sm:w-auto">
-            <TabsTrigger value="ar">Piutang</TabsTrigger>
-            <TabsTrigger value="ap">Hutang</TabsTrigger>
+            <TabsTrigger value="ar">{t("receivables.tabAR")}</TabsTrigger>
+            <TabsTrigger value="ap">{t("receivables.tabAP")}</TabsTrigger>
           </TabsList>
           <div className="flex gap-2">
             <ExportMenu
               spec={() => ({
-                title: "Piutang Usaha",
-                subtitle: `${ar.length} faktur belum lunas`,
-                filename: "Piutang-Usaha",
-                head: ["Tanggal", "Invoice", "Jatuh Tempo", "Total", "Dibayar", "Saldo Piutang"],
+                title: t("dashboard.receivables"),
+                subtitle: t("receivables.arHelp", { count: ar.length }),
+                filename: t("dashboard.receivables"),
+                head: [t("common.date"), t("common.invoiceCol"), t("common.dueDate"), t("common.total"), t("common.paid"), t("sales.balanceAR")],
                 body: ar.map((r) => [
                   r.sale_date,
                   r.invoice_no,
@@ -94,14 +94,14 @@ function ReceivablesPage() {
                 cols: [12, 16, 14, 14, 14, 14],
                 totalRow: ["TOTAL", "", "", "", "", totalAR],
               })}
-              label="Ekspor Piutang"
+              label={t("receivables.exportAR")}
             />
             <ExportMenu
               spec={() => ({
-                title: "Hutang Usaha",
-                subtitle: `${ap.length} nota belum lunas`,
-                filename: "Hutang-Usaha",
-                head: ["Tanggal", "No. Nota", "Jatuh Tempo", "Total", "Dibayar", "Saldo Hutang"],
+                title: t("dashboard.payables"),
+                subtitle: t("receivables.apHelp", { count: ap.length }),
+                filename: t("dashboard.payables"),
+                head: [t("common.date"), t("purchases.invoice"), t("common.dueDate"), t("common.total"), t("common.paid"), t("purchases.balanceAP")],
                 body: ap.map((r) => [
                   r.purchase_date,
                   r.invoice_no,
@@ -113,7 +113,7 @@ function ReceivablesPage() {
                 cols: [12, 16, 14, 14, 14, 14],
                 totalRow: ["TOTAL", "", "", "", "", totalAP],
               })}
-              label="Ekspor Hutang"
+              label={t("receivables.exportAP")}
             />
           </div>
         </div>
@@ -137,6 +137,7 @@ function DebtTable({
   rows: any[];
   qc: ReturnType<typeof useQueryClient>;
 }) {
+  const { t } = useTranslation();
   const dateKey = kind === "sales" ? "sale_date" : "purchase_date";
   const queryKey = kind === "sales" ? "ar" : "ap";
 
@@ -147,20 +148,20 @@ function DebtTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Tanggal</TableHead>
-                <TableHead>Nomor</TableHead>
-                <TableHead>Jatuh Tempo</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-                <TableHead className="text-right">Dibayar</TableHead>
-                <TableHead className="text-right">Saldo</TableHead>
-                <TableHead className="w-48">Pelunasan</TableHead>
+                <TableHead>{t("common.date")}</TableHead>
+                <TableHead>{t("common.number")}</TableHead>
+                <TableHead>{t("common.dueDate")}</TableHead>
+                <TableHead className="text-right">{t("common.total")}</TableHead>
+                <TableHead className="text-right">{t("common.paid")}</TableHead>
+                <TableHead className="text-right">{t("common.balance")}</TableHead>
+                <TableHead className="w-48">{t("receivables.addPayment")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
-                    Semua sudah lunas 🎉
+                    {t("receivables.allSettled")}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -196,19 +197,20 @@ function PayRow({
   dateKey: string;
   onPaid: () => void;
 }) {
+  const { t } = useTranslation();
   const sisa = Number(row.total) - Number(row.paid);
   const [amount, setAmount] = useState<number | "">("");
 
   async function pay(full: boolean) {
     const add = full ? sisa : Number(amount || 0);
-    if (add <= 0) return toast.error("Masukkan jumlah pembayaran");
-    if (add > sisa + 0.01) return toast.error("Pembayaran melebihi sisa");
+    if (add <= 0) return toast.error(t("receivables.payEnter"));
+    if (add > sisa + 0.01) return toast.error(t("receivables.payExceeds"));
     const { error } = await supabase
       .from(kind)
       .update({ paid: Number(row.paid) + add })
       .eq("id", row.id);
     if (error) return toast.error(error.message);
-    toast.success("Pelunasan tercatat");
+    toast.success(t("receivables.paymentRecorded"));
     setAmount("");
     onPaid();
   }
@@ -221,7 +223,7 @@ function PayRow({
         {row.due_date ?? "—"}
         {row.due_date && row.due_date < new Date().toISOString().slice(0, 10) && (
           <span className="ml-2 rounded bg-destructive/10 px-2 py-0.5 text-xs text-destructive">
-            Terlambat
+            {t("common.overdue")}
           </span>
         )}
       </TableCell>
@@ -239,11 +241,11 @@ function PayRow({
           />
           <div className="flex gap-1">
             <Button size="sm" variant="outline" onClick={() => pay(false)}>
-              Bayar
+              {t("receivables.pay")}
             </Button>
             <Button size="sm" onClick={() => pay(true)} className="gap-1">
               <Check className="h-3 w-3" />
-              Lunas
+              {t("common.paidOff")}
             </Button>
           </div>
         </div>

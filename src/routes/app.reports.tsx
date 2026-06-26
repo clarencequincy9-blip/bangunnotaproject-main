@@ -153,7 +153,7 @@ function ReportsPage() {
       const expenseByCat = [...byCat.entries()].map(([category, amount]) => ({ category, amount }));
       const profitByCategory = new Map<string, { revenue: number; cogs: number }>();
       items.forEach((item) => {
-        const category = item.product?.category?.name ?? "Tanpa Kategori";
+        const category = item.product?.category?.name ?? t("reports.uncategorized");
         const current = profitByCategory.get(category) ?? { revenue: 0, cogs: 0 };
         current.revenue += Number(item.subtotal);
         current.cogs += Number(item.qty) * Number(item.cost ?? 0);
@@ -166,19 +166,19 @@ function ReportsPage() {
       }));
       const now = new Date(`${to}T00:00:00`).getTime();
       const buildAging = () => [
-        { label: "0–14 hari", amount: 0, action: "Supply lancar" },
-        { label: "15–30 hari", amount: 0, action: "Kirim pengingat tagihan" },
-        { label: "> 30 hari", amount: 0, action: "Tinjau penghentian kredit" },
+        { label: t("reports.age0"), amount: 0, action: t("reports.actSupplyOk") },
+        { label: t("reports.age1"), amount: 0, action: t("reports.actSendReminder") },
+        { label: t("reports.age2"), amount: 0, action: t("reports.actReviewCredit") },
       ];
       const aging = buildAging();
       const apAging = buildAging().map((entry) => ({
         ...entry,
         action:
-          entry.label === "0–14 hari"
-            ? "Jadwalkan pelunasan"
-            : entry.label === "15–30 hari"
-              ? "Hubungi pemasok"
-              : "Negosiasi ulang termin",
+          entry.label === t("reports.age0")
+            ? t("reports.actSchedule")
+            : entry.label === t("reports.age1")
+              ? t("reports.actContactSupplier")
+              : t("reports.actRenegotiate"),
       }));
       openSales.forEach((sale) => {
         const basis = sale.due_date ?? sale.sale_date;
@@ -243,40 +243,40 @@ function ReportsPage() {
   });
 
   const rows = [
-    { label: "Pendapatan Penjualan", value: data?.revenue ?? 0, bold: false, big: false },
-    { label: "Harga Pokok Penjualan (HPP)", value: -(data?.cogs ?? 0), bold: false, big: false },
-    { label: "Laba Kotor", value: data?.gross ?? 0, bold: true, big: false },
-    { label: "Total Beban Operasional", value: -(data?.expense ?? 0), bold: false, big: false },
-    { label: "Laba / Rugi Bersih", value: data?.net ?? 0, bold: true, big: true },
+    { label: t("reports.revenue"), value: data?.revenue ?? 0, bold: false, big: false },
+    { label: t("reports.cogs"), value: -(data?.cogs ?? 0), bold: false, big: false },
+    { label: t("reports.grossProfit"), value: data?.gross ?? 0, bold: true, big: false },
+    { label: t("reports.totalOpex"), value: -(data?.expense ?? 0), bold: false, big: false },
+    { label: t("reports.netIncome"), value: data?.net ?? 0, bold: true, big: true },
   ];
 
   function exportExcel() {
     if (!data) return;
-    const period = `${from} s/d ${to}`;
+    const period = t("reports.periodLabel", { from, to });
     const pl = [
-      ["LAPORAN LABA RUGI"],
-      ["Periode", period],
+      [t("reports.plTitle")],
+      [t("common.period"), period],
       [],
-      ["Keterangan", "Jumlah (Rp)"],
-      ["Pendapatan Penjualan", data.revenue],
-      ["Harga Pokok Penjualan", -data.cogs],
-      ["Laba Kotor", data.gross],
-      ["Beban Operasional", -data.expense],
-      ["Laba / Rugi Bersih", data.net],
+      [t("reports.plReport"), t("reports.amountRp")],
+      [t("reports.revenue"), data.revenue],
+      [t("reports.cogs"), -data.cogs],
+      [t("reports.grossProfit"), data.gross],
+      [t("reports.opex"), -data.expense],
+      [t("reports.netIncome"), data.net],
     ];
     const salesRows = [
       [
-        "Tanggal",
-        "No. Invoice",
-        "Subtotal",
-        "Diskon",
-        "Ongkir",
-        "Total",
-        "Dibayar",
-        "Sisa",
-        "Jatuh Tempo",
-        "Metode",
-        "Catatan",
+        t("common.date"),
+        t("sales.invoice"),
+        t("common.subtotal"),
+        t("common.discount"),
+        t("common.deliveryFee"),
+        t("common.total"),
+        t("common.paid"),
+        t("common.remaining"),
+        t("common.dueDate"),
+        t("common.method"),
+        t("common.notes"),
       ],
       ...data.sales.map((s) => [
         s.sale_date,
@@ -293,7 +293,7 @@ function ReportsPage() {
       ]),
     ];
     const purRows = [
-      ["Tanggal", "No. Nota", "Total", "Dibayar", "Sisa", "Jatuh Tempo", "Metode", "Catatan"],
+      [t("common.date"), t("purchases.invoice"), t("common.total"), t("common.paid"), t("common.remaining"), t("common.dueDate"), t("common.method"), t("common.notes")],
       ...data.purchases.map((p) => [
         p.purchase_date,
         p.invoice_no,
@@ -306,7 +306,7 @@ function ReportsPage() {
       ]),
     ];
     const expRows = [
-      ["Tanggal", "Kategori", "Jumlah", "Catatan"],
+      [t("common.date"), t("common.category"), t("common.amount"), t("common.notes")],
       ...data.expenses.map((e: any) => [
         e.expense_date,
         e.category,
@@ -315,15 +315,15 @@ function ReportsPage() {
       ]),
     ];
     const catRows = [
-      ["Kategori", "Total"],
+      [t("common.category"), t("common.total")],
       ...data.expenseByCat.map((c) => [c.category, c.amount]),
     ];
     const agingRows = [
-      ["Umur", "Saldo", "Tindakan"],
+      [t("reports.agingAge"), t("common.balance"), t("reports.action")],
       ...data.aging.map((entry) => [entry.label, entry.amount, entry.action]),
     ];
     const profitRows = [
-      ["Kategori", "Pendapatan", "HPP", "Laba Kotor"],
+      [t("common.category"), t("reports.revenue"), t("reports.cogs"), t("reports.grossProfit")],
       ...data.categoryProfit.map((entry) => [
         entry.category,
         entry.revenue,
@@ -332,15 +332,15 @@ function ReportsPage() {
       ]),
     ];
     downloadExcel(`Laporan-Keuangan_${from}_${to}.xlsx`, [
-      { name: "Laba Rugi", rows: pl, cols: [30, 18] },
-      { name: "Penjualan", rows: salesRows, cols: [12, 18, 14, 12, 12, 14, 14, 14, 14, 12, 28] },
-      { name: "Pembelian", rows: purRows, cols: [12, 18, 14, 14, 14, 14, 12, 28] },
-      { name: "Pengeluaran", rows: expRows, cols: [12, 18, 14, 28] },
-      { name: "Per Kategori", rows: catRows, cols: [20, 16] },
-      { name: "Aging Piutang", rows: agingRows, cols: [16, 18, 30] },
-      { name: "Laba per Kategori", rows: profitRows, cols: [24, 18, 18, 18] },
+      { name: t("reports.tabPL"), rows: pl, cols: [30, 18] },
+      { name: t("dashboard.sales"), rows: salesRows, cols: [12, 18, 14, 12, 12, 14, 14, 14, 14, 12, 28] },
+      { name: t("purchases.title"), rows: purRows, cols: [12, 18, 14, 14, 14, 14, 12, 28] },
+      { name: t("expenses.title"), rows: expRows, cols: [12, 18, 14, 28] },
+      { name: t("reports.expByCat"), rows: catRows, cols: [20, 16] },
+      { name: t("reports.tabAgingAR"), rows: agingRows, cols: [16, 18, 30] },
+      { name: t("reports.profitByCat"), rows: profitRows, cols: [24, 18, 18, 18] },
     ]);
-    toast.success("File Excel diunduh");
+    toast.success(t("common.excelDownloaded"));
   }
 
   return (
@@ -358,22 +358,22 @@ function ReportsPage() {
               if (!data) return;
               printDocument(
                 tableHtml({
-                  title: "Laporan Laba Rugi",
-                  subtitle: `Periode ${from} s/d ${to}`,
-                  head: ["Keterangan", "Jumlah (Rp)"],
+                  title: t("reports.plTitle"),
+                  subtitle: t("reports.periodLabel", { from, to }),
+                  head: [t("reports.plReport"), t("reports.amountRp")],
                   body: [
-                    ["Pendapatan Penjualan", idr(data.revenue)],
-                    ["Harga Pokok Penjualan", `(${idr(data.cogs)})`],
-                    ["Laba Kotor", idr(data.gross)],
-                    ["Beban Operasional", `(${idr(data.expense)})`],
+                    [t("reports.revenue"), idr(data.revenue)],
+                    [t("reports.cogs"), `(${idr(data.cogs)})`],
+                    [t("reports.grossProfit"), idr(data.gross)],
+                    [t("reports.opex"), `(${idr(data.expense)})`],
                   ],
-                  totalRow: ["LABA / RUGI BERSIH", idr(data.net)],
+                  totalRow: [t("reports.netLossUpper"), idr(data.net)],
                 }),
-                "Laporan Laba Rugi",
+                t("reports.plTitle"),
               );
             }}
           >
-            <Printer className="h-4 w-4" /> Cetak L/R
+            <Printer className="h-4 w-4" /> {t("reports.printPL")}
           </Button>
           <Button
             variant="outline"
@@ -381,19 +381,19 @@ function ReportsPage() {
             onClick={() => {
               if (!data) return;
               exportPDF({
-                title: "Laporan Laba Rugi",
-                subtitle: `Periode ${from} s/d ${to}`,
-                head: ["Keterangan", "Jumlah (Rp)"],
+                title: t("reports.plTitle"),
+                subtitle: t("reports.periodLabel", { from, to }),
+                head: [t("reports.plReport"), t("reports.amountRp")],
                 body: [
-                  ["Pendapatan Penjualan", idr(data.revenue)],
-                  ["Harga Pokok Penjualan", `(${idr(data.cogs)})`],
-                  ["Laba Kotor", idr(data.gross)],
-                  ["Beban Operasional", `(${idr(data.expense)})`],
-                  ["Laba / Rugi Bersih", idr(data.net)],
+                  [t("reports.revenue"), idr(data.revenue)],
+                  [t("reports.cogs"), `(${idr(data.cogs)})`],
+                  [t("reports.grossProfit"), idr(data.gross)],
+                  [t("reports.opex"), `(${idr(data.expense)})`],
+                  [t("reports.netIncome"), idr(data.net)],
                 ],
                 filename: `Laba-Rugi_${from}_${to}.pdf`,
               });
-              toast.success("PDF diunduh");
+              toast.success(t("common.pdfDownloaded"));
             }}
           >
             <FileText className="h-4 w-4" /> PDF
@@ -407,11 +407,11 @@ function ReportsPage() {
       <Card>
         <CardContent className="flex flex-wrap items-end gap-4 p-4">
           <div className="flex-1 space-y-2 sm:flex-none">
-            <Label>Dari</Label>
+            <Label>{t("reports.from")}</Label>
             <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
           </div>
           <div className="flex-1 space-y-2 sm:flex-none">
-            <Label>Sampai</Label>
+            <Label>{t("reports.to")}</Label>
             <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
           </div>
         </CardContent>
@@ -419,18 +419,18 @@ function ReportsPage() {
 
       <Tabs defaultValue="monthly">
         <TabsList className="grid h-auto w-full grid-cols-2 sm:grid-cols-6">
-          <TabsTrigger value="daily">Harian</TabsTrigger>
-          <TabsTrigger value="aging">Umur Piutang</TabsTrigger>
-          <TabsTrigger value="apaging">Umur Hutang</TabsTrigger>
-          <TabsTrigger value="monthly">Laba Rugi</TabsTrigger>
-          <TabsTrigger value="balance">Posisi Keuangan</TabsTrigger>
-          <TabsTrigger value="annual">Tahunan</TabsTrigger>
+          <TabsTrigger value="daily">{t("reports.tabDaily")}</TabsTrigger>
+          <TabsTrigger value="aging">{t("reports.tabAgingAR")}</TabsTrigger>
+          <TabsTrigger value="apaging">{t("reports.tabAgingAP")}</TabsTrigger>
+          <TabsTrigger value="monthly">{t("reports.tabPL")}</TabsTrigger>
+          <TabsTrigger value="balance">{t("reports.tabBalance")}</TabsTrigger>
+          <TabsTrigger value="annual">{t("reports.tabAnnual")}</TabsTrigger>
         </TabsList>
         <TabsContent value="daily" className="grid gap-4 sm:grid-cols-3">
           {[
-            ["Pembayaran Supplier", data?.supplierPayments ?? 0],
-            ["Solar & Transportasi", data?.fuelExpense ?? 0],
-            ["Upah Muat & Gaji", data?.laborExpense ?? 0],
+            [t("reports.cardSupplierPay"), data?.supplierPayments ?? 0],
+            [t("reports.cardFuel"), data?.fuelExpense ?? 0],
+            [t("reports.cardLabor"), data?.laborExpense ?? 0],
           ].map(([label, value]) => (
             <Card key={String(label)}>
               <CardContent className="p-5">
@@ -447,9 +447,9 @@ function ReportsPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Umur Keterlambatan</TableHead>
-                      <TableHead className="text-right">Saldo</TableHead>
-                      <TableHead>Tindakan</TableHead>
+                      <TableHead>{t("reports.agingAge")}</TableHead>
+                      <TableHead className="text-right">{t("common.balance")}</TableHead>
+                      <TableHead>{t("reports.action")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -475,9 +475,9 @@ function ReportsPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Umur Hutang ke Pemasok</TableHead>
-                      <TableHead className="text-right">Saldo</TableHead>
-                      <TableHead>Tindakan</TableHead>
+                      <TableHead>{t("reports.apAgingAge")}</TableHead>
+                      <TableHead className="text-right">{t("common.balance")}</TableHead>
+                      <TableHead>{t("reports.action")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -499,36 +499,36 @@ function ReportsPage() {
         <TabsContent value="balance" className="grid gap-4 lg:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Arus Kas Ringkas</CardTitle>
+              <CardTitle>{t("reports.cashFlow")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-              <Row label="Saldo Kas Awal Periode" value={data?.openingCash ?? 0} />
-              <Row label="(+) Penerimaan Kas" value={data?.cashIn ?? 0} />
+              <Row label={t("reports.openingCash")} value={data?.openingCash ?? 0} />
+              <Row label={t("reports.cashIn")} value={data?.cashIn ?? 0} />
               <Row
-                label="(−) Pembayaran Pemasok & Beban"
+                label={t("reports.cashOut")}
                 value={-(data?.cashOut ?? 0)}
               />
               <div className="my-2 border-t" />
-              <Row label="Saldo Kas Akhir Periode" value={data?.endingCash ?? 0} bold big />
+              <Row label={t("reports.endingCash")} value={data?.endingCash ?? 0} bold big />
             </CardContent>
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Posisi Keuangan (Saldo Akhir)</CardTitle>
+              <CardTitle>{t("reports.financialPosition")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-              <Row label="Kas & Setara Kas" value={data?.endingCash ?? 0} />
-              <Row label="Piutang Usaha" value={data?.totalAR ?? 0} />
-              <Row label="Nilai Persediaan (HPP)" value={data?.inventoryValue ?? 0} />
+              <Row label={t("reports.cash")} value={data?.endingCash ?? 0} />
+              <Row label={t("dashboard.receivables")} value={data?.totalAR ?? 0} />
+              <Row label={t("reports.inventoryValueCogs")} value={data?.inventoryValue ?? 0} />
               <div className="my-2 border-t" />
               <Row
-                label="Total Aset Lancar"
+                label={t("reports.currentAssets")}
                 value={(data?.endingCash ?? 0) + (data?.totalAR ?? 0) + (data?.inventoryValue ?? 0)}
                 bold
               />
-              <Row label="Hutang Usaha" value={data?.totalAP ?? 0} />
+              <Row label={t("dashboard.payables")} value={data?.totalAP ?? 0} />
               <p className="pt-2 text-xs text-muted-foreground">
-                Saldo awal periode berikutnya akan otomatis diambil dari nilai akhir periode ini.
+                {t("reports.carryNote")}
               </p>
             </CardContent>
           </Card>
@@ -536,7 +536,7 @@ function ReportsPage() {
         <TabsContent value="monthly" className="grid gap-4 lg:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Laporan Laba / Rugi</CardTitle>
+              <CardTitle>{t("reports.plReport")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
@@ -565,12 +565,12 @@ function ReportsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Pengeluaran per Kategori</CardTitle>
+              <CardTitle>{t("reports.expByCat")}</CardTitle>
             </CardHeader>
             <CardContent>
               {(data?.expenseByCat ?? []).length === 0 ? (
                 <p className="py-12 text-center text-sm text-muted-foreground">
-                  Belum ada pengeluaran pada periode ini.
+                  {t("reports.noExpInPeriod")}
                 </p>
               ) : (
                 <ResponsiveContainer width="100%" height={260}>
@@ -591,12 +591,12 @@ function ReportsPage() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Kontribusi Laba per Kategori</CardTitle>
+              <CardTitle>{t("reports.profitByCat")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {(data?.categoryProfit ?? []).length === 0 ? (
                 <p className="py-8 text-center text-sm text-muted-foreground">
-                  Belum ada data kategori produk.
+                  {t("reports.noCatData")}
                 </p>
               ) : (
                 data!.categoryProfit.map((entry) => (
@@ -615,16 +615,15 @@ function ReportsPage() {
         <TabsContent value="annual">
           <Card>
             <CardHeader>
-              <CardTitle>Kinerja Tahunan / Periode Terpilih</CardTitle>
+              <CardTitle>{t("reports.annualPerf")}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Laba operasional aktual berdasarkan transaksi pada periode, tanpa angka proyeksi
-                simulasi.
+                {t("reports.annualDesc")}
               </p>
               <p className="mt-3 text-3xl font-bold">{idr(data?.net ?? 0)}</p>
               <p className="mt-2 text-sm">
-                Margin laba bersih:{" "}
+                {t("reports.netMargin")}{" "}
                 <strong>
                   {(data?.revenue ?? 0) > 0
                     ? (((data?.net ?? 0) / (data?.revenue ?? 1)) * 100).toFixed(1)

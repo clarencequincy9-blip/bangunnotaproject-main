@@ -52,14 +52,14 @@ function PurchasesPage() {
         <div className="flex gap-2 shrink-0">
         <ExportMenu
           spec={() => ({
-            title: "Daftar Pembelian",
-            subtitle: `${purchases.length} nota`,
-            filename: "Pembelian",
-            head: ["Tanggal", "No. Nota", "Status", "Jatuh Tempo", "Total", "Dibayar", "Saldo Hutang"],
+            title: t("purchases.exportTitle"),
+            subtitle: t("purchases.billCount", { n: purchases.length }),
+            filename: t("purchases.exportFile"),
+            head: [t("common.date"), t("purchases.invoice"), t("common.status"), t("common.dueDate"), t("common.total"), t("common.paid"), t("purchases.balanceAP")],
             body: purchases.map((p) => [
               p.purchase_date,
               p.invoice_no,
-              Number(p.total) - Number(p.paid) < 0.01 ? "Lunas" : "Hutang",
+              Number(p.total) - Number(p.paid) < 0.01 ? t("common.paidOff") : t("receivables.tabAP"),
               p.due_date ?? "",
               Number(p.total),
               Number(p.paid),
@@ -80,8 +80,8 @@ function PurchasesPage() {
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="gap-2">
-              <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Pembelian Baru</span>
-              <span className="sm:hidden">Baru</span>
+              <Plus className="h-4 w-4" /> <span className="hidden sm:inline">{t("purchases.new")}</span>
+              <span className="sm:hidden">{t("common.new")}</span>
             </Button>
           </DialogTrigger>
           <NewPurchaseDialog
@@ -103,11 +103,11 @@ function PurchasesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Tanggal</TableHead>
-                  <TableHead>No. Nota</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="hidden md:table-cell">Jatuh Tempo</TableHead>
-                  <TableHead className="text-right">Total</TableHead>
+                  <TableHead>{t("common.date")}</TableHead>
+                  <TableHead>{t("purchases.invoice")}</TableHead>
+                  <TableHead>{t("common.status")}</TableHead>
+                  <TableHead className="hidden md:table-cell">{t("common.dueDate")}</TableHead>
+                  <TableHead className="text-right">{t("common.total")}</TableHead>
                   <TableHead className="w-16"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -115,7 +115,7 @@ function PurchasesPage() {
                 {purchases.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
-                      Belum ada pembelian.
+                      {t("purchases.noPurchases")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -130,10 +130,10 @@ function PurchasesPage() {
                         <TableCell>
                           {lunas ? (
                             <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">
-                              Lunas
+                              {t("common.paidOff")}
                             </Badge>
                           ) : (
-                            <Badge variant="destructive">Hutang</Badge>
+                            <Badge variant="destructive">{t("receivables.tabAP")}</Badge>
                           )}
                         </TableCell>
                         <TableCell className="hidden whitespace-nowrap md:table-cell">
@@ -147,14 +147,14 @@ function PurchasesPage() {
                             size="icon"
                             variant="ghost"
                             onClick={async () => {
-                              if (!confirm(`Hapus ${p.invoice_no}?`)) return;
+                              if (!confirm(t("purchases.deleteConfirm", { no: p.invoice_no }))) return;
                               const { error } = await supabase
                                 .from("purchases")
                                 .delete()
                                 .eq("id", p.id);
                               if (error) toast.error(error.message);
                               else {
-                                toast.success("Dihapus");
+                                toast.success(t("common.deleted"));
                                 qc.invalidateQueries({ queryKey: ["purchases"] });
                                 qc.invalidateQueries({ queryKey: ["products"] });
                               }
